@@ -60,6 +60,16 @@ class ZCdbReader(cdb.Cdb):
         f.close()
         return zlib.decompress(d).decode('utf-8')
 
+    def getitem_size(self, key):
+        key = key.encode("utf-8")
+        data = cdb.Cdb.__getitem__(self, key) # may raise KeyError 
+        pos, len = map(int, data.split())
+        return len
+
+    def iteritems_sizes(self):
+        return ((k.decode('utf-8'), int(v.split(' ')[1]))
+            for k,v in cdb.Cdb.iteritems(self))
+
     def iterkeys(self):
         return (k.decode('utf-8') for k in cdb.Cdb.iterkeys(self))
 
